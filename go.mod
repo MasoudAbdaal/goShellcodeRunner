@@ -1,4 +1,4 @@
-module first_malware
+module goShellcodeRunner
 
 go 1.24.0
 

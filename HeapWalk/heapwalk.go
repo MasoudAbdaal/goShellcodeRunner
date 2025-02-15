@@ -1,7 +1,7 @@
 package heapwalk
 
 import (
-	dll "first_malware/DLL"
+	dll "goShellcodeRunner/DLL"
 	"log"
 	"unsafe"
 
@@ -26,6 +26,7 @@ func GetProcessHeap() {
 
 	var heapEntry PROCESS_HEAP_ENTRY
 
+	//TODO: delete unsafe pointer to prevent memory leaks
 	ret, _, _ := procHeapWalk.Call(heapHandle, uintptr(unsafe.Pointer(&heapEntry)))
 
 	if ret != 0 {

@@ -20,6 +20,7 @@ type HeapRegion struct {
 // TODO: Review validation of fields value after mapping to unionData [24]byte
 // Are they is the same as while called from C++?
 // For verify data use other heap-related functions to find-out is the data valid?
+// Can i use PowerShell to map this variable cleanly?
 type PROCESS_HEAP_ENTRY_UNION struct {
 	lpData       uintptr
 	cbData       uint32
@@ -33,6 +34,10 @@ func (entry *PROCESS_HEAP_ENTRY_UNION) Block() *HeapBlock {
 }
 
 func (entry *PROCESS_HEAP_ENTRY_UNION) Region() *HeapRegion {
+	// TODO: &entry.unionData should increase by size of "Block union"
+	// in the main C++ _PROCESS_HEAP_ENTRY
+	// https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-process_heap_entry#syntax
+	// psudo code: return (*HeapRegion)(unsafe.Pointer(&entry.unionData[(sizeOf(hMem)+sizeOf(dwReserved[3])]))
 	return (*HeapRegion)(unsafe.Pointer(&entry.unionData[0]))
 }
 

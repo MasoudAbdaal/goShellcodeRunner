@@ -1,8 +1,8 @@
-package main
+package shellcode
 
 import (
 	"encoding/hex"
-	dll "first_malware/DLL"
+	dll "goShellcodeRunner/DLL"
 	"log"
 	"syscall"
 	"unsafe"

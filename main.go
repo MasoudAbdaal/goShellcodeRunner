@@ -1,11 +1,12 @@
 package main
 
 import (
-	heapwalk "first_malware/HeapWalk"
+	heapwalk "goShellcodeRunner/HeapWalk"
+	shellcode "goShellcodeRunner/Shellcode"
 )
 
 func main() {
 	heapwalk.GetProcessHeap()
 
-	ExecuteCalculator()
+	shellcode.ExecuteCalculator()
 }
