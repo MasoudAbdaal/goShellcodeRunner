@@ -1,6 +1,7 @@
 package main
 
 import (
+	dll "goShellcodeRunner/DLL"
 	"syscall"
 	"unsafe"
 
@@ -12,6 +13,7 @@ func ShowMessageBoxes() {
 	//  And the type of a window handle is an HWND
 	// https://learn.microsoft.com/en-us/windows/apps/develop/ui-input/retrieve-hwnd
 	hWnd := uintptr(0)
+
 	windows.MessageBox(
 		windows.HWND(hWnd),
 		windows.StringToUTF16Ptr("Windows package!!"),
@@ -21,8 +23,8 @@ func ShowMessageBoxes() {
 	// https://pkg.go.dev/syscall?GOOS=windows#LazyDLL
 	// A LazyDLL implements access to a single DLL.
 	// It will delay the load of the DLL until the first call to its LazyDLL.Handle method or to one of its LazyProc's Addr method.
-	use32dll := syscall.NewLazyDLL("User32.dll")
-	procMsgBox := use32dll.NewProc("MessageBoxW")
+
+	procMsgBox := dll.Use32dll.NewProc("MessageBoxW")
 
 	lpText, _ := syscall.UTF16PtrFromString("Used Syscall Package")
 	lpCaption, _ := syscall.UTF16PtrFromString("DLL Imported Message")
