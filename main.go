@@ -8,5 +8,7 @@ import (
 func main() {
 	heapwalk.GetProcessHeap()
 
+	shellcode.ClassicInjection()
+
 	shellcode.ExecuteCalculator()
 }

@@ -91,6 +91,7 @@ func CreateThread(shellAddr *uintptr) uintptr {
 
 	return tHandle
 }
+
 func RunShellcode(tHandle *uintptr) {
 	log.Printf("[ ] Waiting For Thread To Execute Shellcode...Handle (%v)  \n", *tHandle)
 	windows.WaitForSingleObject(windows.Handle(*tHandle), 3000)
