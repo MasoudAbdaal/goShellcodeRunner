@@ -16,7 +16,7 @@ func ExecuteCalculator() {
 
 	shellAddr, shellSrc := AllocateShellcode()
 
-	CopyShellcodeToMemory(shellAddr, &shellSrc)
+	CopyShellcodeToMemory(shellAddr, shellSrc)
 
 	ChangeShellcodeMemoryToRX(&shellAddr, len(shellSrc))
 
@@ -46,17 +46,14 @@ func AllocateShellcode() (uintptr, []byte) {
 	return shellAddr, shellCodeSrc
 }
 
-func CopyShellcodeToMemory(destAddr uintptr, shellCodeSrc *[]byte) {
-
+func CopyShellcodeToMemory(destAddr uintptr, shellCodeSrc []byte) {
+	//RtlMoveMemory is for local process memory (not cross-process).
 	procRtlMoveMemory := dll.NtDll.NewProc("RtlMoveMemory")
 
 	procRtlMoveMemory.Call(
-
-		uintptr(unsafe.Pointer(&destAddr)),
-		// 1. Dereference Before Indexing
-		// 2. Pointer to First Element
-		uintptr(unsafe.Pointer(&(*shellCodeSrc)[0])),
-		uintptr(len(*shellCodeSrc)))
+		destAddr,
+		uintptr(unsafe.Pointer(&(shellCodeSrc)[0])),
+		uintptr(len(shellCodeSrc)))
 
 	log.Printf("[+] Shellcode Wrote Done 0x[%v] \n", destAddr)
 }

