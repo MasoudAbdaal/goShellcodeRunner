@@ -12,6 +12,10 @@ import (
 const PROCESS_ALL_ACCESS = windows.STANDARD_RIGHTS_REQUIRED | windows.SYNCHRONIZE | 0xFFFF
 
 func CreateCmdProcess() syscall.Handle {
+	// TODO: In Bash, when you add a SPACE before your command, it hides from history!
+	// How can I do the same in cmd or Powershell?
+	// What other techniques is there for hide ourself?
+	// https://www.linkedin.com/posts/activity-7290113056188112898-RBXE?utm_source=share&utm_medium=member_desktop&rcm=ACoAADR0WIUBHui16sjo_P6svUUR2yJg4DCoe7w
 	cmdPtr, err := syscall.UTF16PtrFromString("C:\\Windows\\System32\\cmd.exe")
 	cmdArgPtr, err2 := syscall.UTF16FromString(" /c ping /t c2.com")
 
@@ -36,7 +40,9 @@ func CreateCmdProcess() syscall.Handle {
 		// CREATE_UNICODE_ENVIRONMENT = 0x00000400
 		// DEBUG_PROCESS = 0x00000001
 		// https://learn.microsoft.com/en-us/windows/win32/procthread/process-creation-flags#flags
-		0x00000800, nil, nil,
+
+		// Used NewConsole for debuggging and end process!
+		0x00000010, nil, nil,
 		&startupInfo,
 		&procInfo)
 
@@ -48,14 +54,22 @@ func CreateCmdProcess() syscall.Handle {
 
 	log.Printf("[PROC] Try To Make A Handle From PID(%v) (cmd.exe) \n", procInfo.ProcessId)
 
-	pHandle, err := syscall.OpenProcess(PROCESS_ALL_ACCESS, false, procInfo.ProcessId)
+	// createHandle_Old contents....
 
-	if err != nil {
+	log.Printf("[PROC] Handle From PID(%v) = %v \n", procInfo.ProcessId, procInfo.Process)
 
-		log.Panicf("[PROC] Error While Getting Handle \"%v\" \n", err)
-	}
-
-	log.Printf("[PROC] Handle From PID(%v) = %v \n", procInfo.ProcessId, pHandle)
-
-	return pHandle
+	return procInfo.Process
 }
+
+// func createHandle_Old() {
+// 	pHandle, err := syscall.OpenProcess(PROCESS_ALL_ACCESS, false, procInfo.ProcessId)
+
+// 	if err != nil {
+
+// 		log.Panicf("[PROC] Error While Getting Handle \"%v\" \n", err)
+// 	}
+
+// 	log.Printf("[PROC] Handle From PID(%v) = %v \n", procInfo.ProcessId, pHandle)
+
+// 	return pHandle
+// }
